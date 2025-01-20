@@ -1,2 +1,2 @@
 # Cerberus
-Cerberus is a secure authentication microservice designed to manage user access using token-based methods like JWT and OAuth2. It provides robust, scalable identity management with features like role-based access control (RBAC) and secure session handling.
+A fast, lightweight, and secure authentication microservice built with Go, designed to handle user registration, login, token management, and access control with ease. Perfect for integrating into modern apps and microservice architectures, it’s simple to set up, fun to use, and flexible enough to grow with your project!
