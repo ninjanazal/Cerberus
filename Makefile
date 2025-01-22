@@ -1,14 +1,16 @@
-.PHONY: up-local
+DEFAULT: dev
+.PHONY: up, down
 
-# Container Commands
-
-up-local:
-	$(MAKE) down-local
+up:
+	$(MAKE) down
 
 	cd docker &&\
 	docker compose build &&\
 	docker compose up -d
 
-down-local:
+down:
 	cd docker &&\
 	docker compose down
+
+dev:
+	go run cmd/main.go
