@@ -13,4 +13,4 @@ down:
 	docker compose down
 
 dev:
-	go run cmd/main.go
+	go run cmd/app/main.go
