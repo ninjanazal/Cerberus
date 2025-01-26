@@ -1,6 +1,7 @@
 package server
 
 import (
+	auth_routes "cerberus/internal/routes"
 	logger "cerberus/internal/tools"
 	"cerberus/pkg/config"
 	"fmt"
@@ -14,17 +15,15 @@ func Start() {
 		cfg = &config.DefaultCfg
 	}
 
-	var server *http.Server = &http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.ServerPort),
-		Handler: createHandler(),
-	}
+	var mux *http.ServeMux = createRequester()
+	auth_routes.SetupAuthRoutes(mux)
 
-	if err := server.ListenAndServe(); err != nil {
-		logger.Default.Errorln(fmt.Sprintf("Error during serving - %s", err))
+	if err := http.ListenAndServe(cfg.GetAddressStr(), mux); err != nil {
+		logger.Log.Info().Msg(fmt.Sprintf("Error during serving - %s", err))
 	}
 }
 
-func createHandler() *http.ServeMux {
+func createRequester() *http.ServeMux {
 	var m *http.ServeMux = http.NewServeMux()
 
 	return m

@@ -27,6 +27,10 @@ func init() {
 // ========================================
 // region Public
 
+func (m_config *ConfigData) GetAddressStr() string {
+	return fmt.Sprintf(":%d", m_config.ServerPort)
+}
+
 // LoadEnvFile loads environment variables from the specified `.env` file.
 // It parses the file, checks for valid key-value pairs, and returns a ConfigData struct
 // with the values of the configuration settings.
@@ -37,13 +41,13 @@ func init() {
 // Returns:
 //   - A pointer to a ConfigData struct populated with the values from the `.env` file.
 //   - An error if there was an issue opening or reading the file.
-func LoadEnvFile(path string) (*ConfigData, error) {
-	file, err := os.Open(path)
+func LoadEnvFile(p_path string) (*ConfigData, error) {
+	file, err := os.Open(p_path)
 
 	cfg := &ConfigData{}
 
 	if err != nil {
-		logger.Default.Errorln(fmt.Sprintf("Error opening .env file: %v", err))
+		logger.Log.Info().Msg(fmt.Sprintf("Error opening .env file: %v", err))
 		return nil, err
 
 	} else {
@@ -57,7 +61,8 @@ func LoadEnvFile(path string) (*ConfigData, error) {
 
 			parts := strings.SplitN(line, "=", 2)
 			if len(parts) != 2 {
-				logger.Default.Warnln(fmt.Sprintf("Skipping malformed line - %s", line))
+				logger.Log.Info().Msg(fmt.Sprintf("Skipping malformed line - %s", line))
+
 				continue
 			}
 
@@ -81,7 +86,7 @@ func LoadEnvFile(path string) (*ConfigData, error) {
 		}
 
 		if err := sc.Err(); err != nil {
-			logger.Default.Fatalln(fmt.Sprintf("Error reading .env file: %v", err))
+			logger.Log.Info().Msg(fmt.Sprintf("Error reading .env file: %v", err))
 			return nil, err
 		}
 	}

@@ -1,11 +1,32 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"fmt"
+	"os"
+	"strings"
+	"time"
 
-var Default *zap.SugaredLogger
+	"github.com/rs/zerolog"
+)
+
+var Log zerolog.Logger
 
 func init() {
-	b, _ := zap.NewProduction()
-	Default = b.Sugar()
-	Default.Named("Default")
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+	output.NoColor = true
+	output.FormatLevel = func(i interface{}) string {
+		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
+	}
+	output.FormatMessage = func(i interface{}) string {
+		return fmt.Sprintf("%s", i)
+	}
+	output.FormatFieldName = func(i interface{}) string {
+		return fmt.Sprintf("%s:", i)
+	}
+	output.FormatFieldValue = func(i interface{}) string {
+		return strings.ToUpper(fmt.Sprintf("%s", i))
+	}
+
+	Log = zerolog.New(output).With().Timestamp().Logger()
+
 }

@@ -6,5 +6,5 @@ import (
 )
 
 func SetupAuthRoutes(*http.ServeMux) {
-	logger.Default.Infoln("Setting up Auth Routes")
+	logger.Log.Info().Msg("Setting up Auth Routes")
 }

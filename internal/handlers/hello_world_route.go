@@ -6,5 +6,5 @@ import (
 )
 
 func HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Default.Infoln("On HelloWorldHandler")
+	logger.Log.Info().Msg("On HelloWorldHandler")
 }

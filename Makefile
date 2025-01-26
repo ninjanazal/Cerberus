@@ -14,3 +14,8 @@ down:
 
 dev:
 	go run cmd/app/main.go
+
+
+# Remove all unused dependencies
+tidy:
+	go mod tidy
