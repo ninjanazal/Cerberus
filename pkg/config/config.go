@@ -3,6 +3,7 @@ package config
 import (
 	"bufio"
 	logger "cerberus/internal/tools"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -42,12 +43,16 @@ func (m_config *ConfigData) GetAddressStr() string {
 //   - A pointer to a ConfigData struct populated with the values from the `.env` file.
 //   - An error if there was an issue opening or reading the file.
 func LoadEnvFile(p_path string) (*ConfigData, error) {
-	file, err := os.Open(p_path)
+	if p_path == "" {
+		logger.Log("Empty config file path, aborting", logger.WARN)
+		return nil, errors.New("empty config file path")
+	}
 
+	file, err := os.Open(p_path)
 	cfg := &ConfigData{}
 
 	if err != nil {
-		logger.Log.Info().Msg(fmt.Sprintf("Error opening .env file: %v", err))
+		logger.Log(fmt.Sprintf("Error opening .env file: %v", err), logger.INFO)
 		return nil, err
 
 	} else {
@@ -61,7 +66,7 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 
 			parts := strings.SplitN(line, "=", 2)
 			if len(parts) != 2 {
-				logger.Log.Info().Msg(fmt.Sprintf("Skipping malformed line - %s", line))
+				logger.Log(fmt.Sprintf("Skipping malformed line - %s", line), logger.INFO)
 
 				continue
 			}
@@ -86,7 +91,7 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 		}
 
 		if err := sc.Err(); err != nil {
-			logger.Log.Info().Msg(fmt.Sprintf("Error reading .env file: %v", err))
+			logger.Log(fmt.Sprintf("Error reading .env file: %v", err), logger.INFO)
 			return nil, err
 		}
 	}
