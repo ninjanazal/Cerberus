@@ -21,6 +21,6 @@ func Start() {
 	routes.SetupRoutes(mux)
 
 	if err := http.ListenAndServe(cfg.GetAddressStr(), mux); err != nil {
-		logger.Log(fmt.Sprintf("Error during serving - %s", err), logger.INFO)
+		logger.Log(fmt.Sprintf("💥 Error during serving - %s", err), logger.INFO)
 	}
 }

@@ -2,30 +2,30 @@ package routes
 
 import "net/http"
 
-// Middleware defines a function type that takes an http.Handler and returns a new http.Handler.
-// This allows for middleware to wrap the handler with additional functionality.
-type Middleware func(http.Handler) http.Handler
-
 // Route represents an HTTP route, including its path, handler, and a list of middlewares.
 // A Route is created with a specific handler and associated middlewares that will be applied when
 // the route is handled by the server.
 type Route struct {
-	Path        string       // The URL path that this route will handle (e.g., "/home")
-	Handler     http.Handler // The handler function to process requests for this route
-	Middlewares []Middleware // A list of middlewares to apply to the route before handling requests
+	Handler http.Handler // The handler function to process requests for this route
+
+	BaseRoute
 }
 
 // NewRoute creates a new route that is registered with the provided ServeMux.
 // The route is initialized with the specified path, handler, and a variadic list of middlewares.
 // The middlewares will be applied in sequence to the handler before it is registered with the mux.
 // The route is then registered with the ServeMux using the provided path and handler.
-func NewRoute(p_mux *http.ServeMux, path string, handler http.Handler, middlewares ...Middleware) *Route {
+func NewRoute(p_mux *http.ServeMux, p_path string, p_handler http.Handler, p_middlewares ...Middleware) *Route {
 	// Create a new Route with the provided path, handler, and middlewares
 	r := &Route{
-		Path:        path,
-		Handler:     handler,
-		Middlewares: middlewares,
+		Handler: p_handler,
+
+		BaseRoute: BaseRoute{
+			Path:        p_path,
+			Middlewares: p_middlewares,
+		},
 	}
+
 	// Apply all middlewares to the route's handler
 	r.applyMiddlewares()
 	// Register the route with the provided ServeMux
