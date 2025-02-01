@@ -1,7 +1,26 @@
 package server
 
-import "fmt"
+import (
+	"cerberus/internal/routes"
+	logger "cerberus/internal/tools"
+	"cerberus/pkg/config"
+	"fmt"
+	"net/http"
+	"os"
+)
 
 func Start() {
-	fmt.Println("Starting")
+	var file_path string = os.Getenv("CONFIG_FILE")
+	cfg, err := config.LoadEnvFile(file_path)
+
+	if err != nil {
+		cfg = &config.DefaultCfg
+	}
+
+	var mux *http.ServeMux = http.NewServeMux()
+	routes.SetupRoutes(mux)
+
+	if err := http.ListenAndServe(cfg.GetAddressStr(), mux); err != nil {
+		logger.Log(fmt.Sprintf("💥 Error during serving - %s", err), logger.INFO)
+	}
 }

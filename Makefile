@@ -13,4 +13,8 @@ down:
 	docker compose down
 
 dev:
-	go run cmd/app/main.go
+	DEBUG=true CONFIG_FILE=${CONFIG_FILE} go run cmd/app/main.go
+
+# Remove all unused dependencies
+tidy:
+	go mod tidy
