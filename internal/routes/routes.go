@@ -2,15 +2,16 @@ package routes
 
 import (
 	logger "cerberus/internal/tools"
+	"cerberus/pkg/config"
 	"fmt"
 	"net/http"
 )
 
-func SetupRoutes(p_mux *http.ServeMux) {
+func SetupRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData) {
 	logger.Log("Setting up Routes", logger.INFO)
 
 	var routes []*Route = make([]*Route, 0)
-	routes = append(routes, SetupAuthRoutes(p_mux)...)
+	routes = append(routes, SetupAuthRoutes(p_mux, p_cfg)...)
 
 	listRoutes(routes)
 }

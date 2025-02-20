@@ -13,23 +13,31 @@ import (
 // ConfigData holds the configuration settings for the application.
 // It includes the server port and the debug flag.
 type ConfigData struct {
-	ServerPort int
-	Debug      bool
+	ServerAddress string
+	ServerPort    int
+	Debug         bool
+
+	EnableCORS     bool
+	AllowedOrigins map[string]bool
 }
 
 // DefaultCfg is the default configuration that is loaded at initialization.
 var DefaultCfg ConfigData
 
 func init() {
+	DefaultCfg.ServerAddress = "localhost"
 	DefaultCfg.ServerPort = 8080
 	DefaultCfg.Debug = true
+
+	DefaultCfg.EnableCORS = true
+	DefaultCfg.AllowedOrigins = make(map[string]bool)
 }
 
 // ========================================
 // region Public
 
 func (m_config *ConfigData) GetAddressStr() string {
-	return fmt.Sprintf(":%d", m_config.ServerPort)
+	return fmt.Sprintf("%s:%d", m_config.ServerAddress, m_config.ServerPort)
 }
 
 // LoadEnvFile loads environment variables from the specified `.env` file.
@@ -76,6 +84,9 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 
 			// Set the corresponding field in the Config struct
 			switch key {
+			case "SERVER_ADDRESS":
+				cfg.ServerAddress = value
+
 			case "SERVER_PORT":
 				v, err := strconv.Atoi(value)
 				if err != nil {
