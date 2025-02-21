@@ -19,6 +19,8 @@ type ConfigData struct {
 
 	EnableCORS     bool
 	AllowedOrigins []string
+
+	PostgresURL string
 }
 
 // DefaultCfg is the default configuration that is loaded at initialization.
@@ -31,6 +33,8 @@ func init() {
 
 	DefaultCfg.EnableCORS = true
 	DefaultCfg.AllowedOrigins = make([]string, 0)
+	DefaultCfg.PostgresURL = "@localhost:5432/authdb?sslmode=disable"
+
 }
 
 // ========================================
