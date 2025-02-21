@@ -18,7 +18,7 @@ type ConfigData struct {
 	Debug         bool
 
 	EnableCORS     bool
-	AllowedOrigins map[string]bool
+	AllowedOrigins []string
 }
 
 // DefaultCfg is the default configuration that is loaded at initialization.
@@ -26,11 +26,11 @@ var DefaultCfg ConfigData
 
 func init() {
 	DefaultCfg.ServerAddress = "localhost"
-	DefaultCfg.ServerPort = 8080
+	DefaultCfg.ServerPort = 8181
 	DefaultCfg.Debug = true
 
 	DefaultCfg.EnableCORS = true
-	DefaultCfg.AllowedOrigins = make(map[string]bool)
+	DefaultCfg.AllowedOrigins = make([]string, 0)
 }
 
 // ========================================
@@ -98,6 +98,12 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 				// Convert string to bool
 				cfg.Debug = value == "true"
 
+			case "ALLOWED_ORIGINS":
+				var trimmed string = strings.Trim(value, "[]")
+				cfg.AllowedOrigins = strings.Split(trimmed, ",")
+				for i, v := range cfg.AllowedOrigins {
+					cfg.AllowedOrigins[i] = strings.Trim(v, `"`)
+				}
 			}
 		}
 

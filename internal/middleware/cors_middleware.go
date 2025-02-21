@@ -3,6 +3,7 @@ package middleware
 import (
 	"cerberus/pkg/config"
 	"net/http"
+	"slices"
 )
 
 // CORSMiddleware is a middleware function that handles Cross-Origin Resource Sharing (CORS)
@@ -56,7 +57,7 @@ func CORSMiddleware(p_cfg *config.ConfigData) func(http.Handler) http.Handler {
 			}
 
 			// Check if the origin is allowed
-			if !p_cfg.AllowedOrigins[origin] {
+			if !slices.Contains(p_cfg.AllowedOrigins, origin) {
 				http.Error(w, "CORS policy does not allow this origin", http.StatusForbidden)
 				return
 			}
