@@ -3,6 +3,7 @@ package config
 import (
 	"bufio"
 	logger "cerberus/internal/tools"
+	postgres_config "cerberus/pkg/config/db"
 	"errors"
 	"fmt"
 	"os"
@@ -20,7 +21,7 @@ type ConfigData struct {
 	EnableCORS     bool
 	AllowedOrigins []string
 
-	PostgresURL string
+	PostgresData postgres_config.ConfigData
 }
 
 // DefaultCfg is the default configuration that is loaded at initialization.
@@ -33,11 +34,9 @@ func init() {
 
 	DefaultCfg.EnableCORS = true
 	DefaultCfg.AllowedOrigins = make([]string, 0)
-	DefaultCfg.PostgresURL = "@localhost:5432/authdb?sslmode=disable"
-
+	DefaultCfg.PostgresData = postgres_config.DefaultCfg
 }
 
-// ========================================
 // region Public
 
 func (m_config *ConfigData) GetAddressStr() string {
@@ -86,7 +85,6 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 			key := strings.TrimSpace(parts[0])
 			value := strings.Trim(strings.TrimSpace(parts[1]), `"'`)
 
-			// Set the corresponding field in the Config struct
 			switch key {
 			case "SERVER_ADDRESS":
 				cfg.ServerAddress = value
@@ -99,7 +97,6 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 				cfg.ServerPort = v
 
 			case "DEBUG":
-				// Convert string to bool
 				cfg.Debug = value == "true"
 
 			case "ALLOWED_ORIGINS":
@@ -108,6 +105,9 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 				for i, v := range cfg.AllowedOrigins {
 					cfg.AllowedOrigins[i] = strings.Trim(v, `"`)
 				}
+
+			default:
+				cfg.PostgresData.ParseLineData(key, value)
 			}
 		}
 
@@ -122,4 +122,3 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 }
 
 // endregion Public
-// ========================================
