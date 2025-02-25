@@ -23,7 +23,7 @@ import (
 // Each route is configured with appropriate handlers and middleware. The function
 // uses a GroupRoute for the "/auth" prefix to apply common middleware to all auth routes.
 func SetupAuthRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dbs *database.Databases) []*Route {
-	logger.Log("Setting up Auth Routes", logger.INFO)
+	logger.Log("🔒 Setting up Auth Routes", logger.INFO)
 
 	var authGroup GroupRoute = *NewGroupRoute(p_mux, "/auth",
 		md.TimeRequestMiddleware, md.CORSMiddleware(p_cfg), md.LogRequestMiddleware)
@@ -33,7 +33,7 @@ func SetupAuthRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dbs *data
 			http.HandlerFunc(handlers.HelloWorldHandler),
 			md.TimeRequestMiddleware, md.CORSMiddleware(p_cfg), md.LogRequestMiddleware),
 
-		authGroup.NewRoute("/register", auth_handler.CreateHandler(p_dbs)),
-		authGroup.NewRoute("/login", http.HandlerFunc(handlers.HelloWorldHandler)),
+		authGroup.NewRoute("/register", auth_handler.CreateHandler(p_dbs),
+			md.PostMethodCheckMiddleware),
 	}
 }
