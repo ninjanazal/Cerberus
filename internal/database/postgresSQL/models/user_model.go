@@ -1,6 +1,11 @@
 package postgres_models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 // User represents a user entity in the application.
 //
@@ -22,9 +27,15 @@ import "time"
 //	"unique": Ensures the field value is unique across all records.
 //	"autoCreateTime": Automatically sets the time when the record is created.
 type User struct {
-	ID        uint      `gorm:"primaryKey"`
+	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	Name      string    `gorm:"not null"`
 	Email     string    `gorm:"unique;not null"`
 	Password  string    `gorm:"not null"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
+}
+
+// BeforeCreate hook to generate UUID before inserting a record
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	u.ID = uuid.New()
+	return
 }

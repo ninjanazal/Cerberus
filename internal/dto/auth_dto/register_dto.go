@@ -1,4 +1,4 @@
-package postgres_dto
+package auth_dto
 
 // RegisterResponse represents the response structure for a successful user registration.
 //
@@ -7,7 +7,7 @@ package postgres_dto
 //   - UserId: An unsigned integer representing the unique identifier of the newly registered user.
 type RegisterResponse struct {
 	Message string `json:"message"`
-	UserId  uint   `json:"user_id"`
+	UserId  string `json:"user_id"`
 }
 
 // RegisterRequest represents the request structure for user registration.

@@ -2,14 +2,14 @@ package auth_handler
 
 import (
 	"cerberus/internal/database"
-	postgres_dto "cerberus/internal/database/postgresSQL/dto"
 	postgres_service "cerberus/internal/database/postgresSQL/service"
+	"cerberus/internal/dto/auth_dto"
 	logger "cerberus/internal/tools"
 	"encoding/json"
 	"net/http"
 )
 
-// CreateHandler returns an http.HandlerFunc for handling user registration requests.
+// CreateRegisterHandler returns an http.HandlerFunc for handling user registration requests.
 //
 // Parameters:
 //   - p_db: A pointer to the database.Databases struct containing database connections.
@@ -19,10 +19,10 @@ import (
 //
 // The handler expects a JSON payload in the request body and returns a JSON response.
 // It uses the provided database connection to perform the user registration operation.
-func CreateHandler(p_db *database.Databases) http.HandlerFunc {
+func CreateRegisterHandler(p_db *database.Databases) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Parse Request
-		var req postgres_dto.RegisterRequest
+		var req auth_dto.RegisterRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			msg := "Invalid request, failed on decode body - " + err.Error()
 			logger.Log(msg, logger.ERROR)
@@ -41,9 +41,9 @@ func CreateHandler(p_db *database.Databases) http.HandlerFunc {
 		// Build response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		res := postgres_dto.RegisterResponse{
+		res := auth_dto.RegisterResponse{
 			Message: "User registered",
-			UserId:  usr.ID,
+			UserId:  usr.ID.String(),
 		}
 		json.NewEncoder(w).Encode(res)
 	})
