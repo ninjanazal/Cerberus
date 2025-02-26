@@ -33,7 +33,10 @@ func SetupAuthRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dbs *data
 			http.HandlerFunc(handlers.HelloWorldHandler),
 			md.TimeRequestMiddleware, md.CORSMiddleware(p_cfg), md.LogRequestMiddleware),
 
-		authGroup.NewRoute("/register", auth_handler.CreateHandler(p_dbs),
+		authGroup.NewRoute("/register", auth_handler.CreateRegisterHandler(p_dbs),
+			md.PostMethodCheckMiddleware),
+
+		authGroup.NewRoute("/change-password", auth_handler.CreateChangePwdHandler(p_dbs),
 			md.PostMethodCheckMiddleware),
 	}
 }

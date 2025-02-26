@@ -39,4 +39,8 @@ func CreateUser(p_db *gorm.DB, p_user *postgres_models.User) error {
 	return p_db.Create(p_user).Error
 }
 
+func UpdatePassword(p_db *gorm.DB, p_user *postgres_models.User, p_pwd string) error {
+	return p_db.Model(&postgres_models.User{}).Where("id = ?", p_user.ID).Update("password", p_pwd).Error
+}
+
 // endregion Public
