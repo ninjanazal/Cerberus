@@ -3,7 +3,8 @@ package config
 import (
 	"bufio"
 	logger "cerberus/internal/tools"
-	postgres_config "cerberus/pkg/config/db"
+	db_config "cerberus/pkg/config/db"
+
 	"errors"
 	"fmt"
 	"os"
@@ -21,7 +22,8 @@ type ConfigData struct {
 	EnableCORS     bool
 	AllowedOrigins []string
 
-	PostgresData postgres_config.ConfigData
+	PostgresData db_config.PostgresConfigData
+	RedisData    db_config.RedisConfigData
 }
 
 // DefaultCfg is the default configuration that is loaded at initialization.
@@ -34,7 +36,8 @@ func init() {
 
 	DefaultCfg.EnableCORS = true
 	DefaultCfg.AllowedOrigins = make([]string, 0)
-	DefaultCfg.PostgresData = postgres_config.DefaultCfg
+	DefaultCfg.PostgresData = db_config.DefaultPostgresCfg
+	DefaultCfg.RedisData = db_config.DefaultRedisConfig
 }
 
 // region Public

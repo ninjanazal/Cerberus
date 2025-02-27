@@ -2,7 +2,8 @@ services:
   postgres:
     image: postgres:17
     container_name: postgres
-    
+    restart: unless-stopped
+
     environment: 
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -16,8 +17,9 @@ services:
 
 
   pgadmin:
-    image: dpage/pgadmin4:8.14.0
+    image: dpage/pgadmin4:latest
     container_name: pgadmin
+    restart: unless-stopped
 
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
@@ -29,6 +31,34 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+
+  redis:
+    image: redis:7.4.2
+    container_name: redis
+    restart: unless-stopped
+
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+    command:  ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: auth_redisinsight
+    restart: unless-stopped
+    
+    ports:
+      - "5540:5540"
+
 volumes:
   postgres_data:
   pgadmin_data:
+
+  redis_data:

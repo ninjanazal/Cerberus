@@ -2,6 +2,7 @@ package database
 
 import (
 	db_postgresSQL "cerberus/internal/database/postgresSQL"
+	db_redis "cerberus/internal/database/redis"
 	logger "cerberus/internal/tools"
 	"cerberus/pkg/config"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 // Currently, it only contains a connection to a PostgreSQL database.
 type Databases struct {
 	Postgres *gorm.DB
+	Redis    *db_redis.RedisPack
 }
 
 // InitDatabases initializes database connections based on the provided configuration.
@@ -39,7 +41,14 @@ func InitDatabases(p_config *config.ConfigData) (*Databases, error) {
 		return nil, err
 	}
 
+	rdb, err := db_redis.ConnectRedis(p_config)
+	if err != nil {
+		logger.Log(fmt.Sprintf("Failed to connect to redis: %s", err.Error()), logger.ERROR)
+		return nil, err
+	}
+
 	return &Databases{
 		Postgres: pdb,
+		Redis:    rdb,
 	}, nil
 }
