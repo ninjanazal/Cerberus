@@ -4,6 +4,7 @@ import (
 	postgres_models "cerberus/internal/database/postgresSQL/models"
 	postgres_repository "cerberus/internal/database/postgresSQL/repository"
 	"cerberus/internal/dto/auth_dto"
+	"cerberus/internal/dto/session_dto"
 	logger "cerberus/internal/tools"
 	"errors"
 	"fmt"
@@ -121,4 +122,30 @@ func ChangePassword(p_db *gorm.DB, p_change_pwd_dto *auth_dto.ChangePasswordRequ
 	}
 
 	return nil
+}
+
+// LoginUserPasswordCheck verifies a user's login credentials against the database.
+//
+// Parameters:
+//   - p_db: A pointer to the gorm.DB instance for database operations.
+//   - p_login_dto: A pointer to the LoginRequest containing the user's email and password.
+//
+// Returns:
+//   - *postgres_models.User: A pointer to the User model if authentication is successful.
+//   - error: An error if authentication fails, nil otherwise.
+//
+// TODO: Maybe set a group of generic dtos, packs that will be shared between services
+func LoginUserPasswordCheck(p_db *gorm.DB, p_login_dto *session_dto.LoginRequest) (*postgres_models.User, error) {
+	usr, err := postgres_repository.FindUserByEmail(p_db, p_login_dto.Email)
+	if err != nil {
+		logger.Log("User not found - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(p_login_dto.Password)); err != nil {
+		logger.Log("Invalid credentials - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	return usr, nil
 }

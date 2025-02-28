@@ -22,6 +22,7 @@ func SetupRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dbs *database
 
 	var routes []*Route = make([]*Route, 0)
 	routes = append(routes, SetupAuthRoutes(p_mux, p_cfg, p_dbs)...)
+	routes = append(routes, SetupSessionRoutes(p_mux, p_cfg, p_dbs)...)
 
 	listRoutes(routes)
 }

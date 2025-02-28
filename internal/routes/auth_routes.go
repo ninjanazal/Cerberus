@@ -24,7 +24,7 @@ import (
 func SetupAuthRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dbs *database.Databases) []*Route {
 	logger.Log("🔒 Setting up Auth Routes", logger.INFO)
 
-	var authGroup GroupRoute = *NewGroupRoute(p_mux, "/auth",
+	var authGroup *GroupRoute = NewGroupRoute(p_mux, "/auth",
 		md.TimeRequestMiddleware, md.CORSMiddleware(p_cfg), md.LogRequestMiddleware)
 
 	return []*Route{
