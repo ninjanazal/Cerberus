@@ -111,6 +111,7 @@ func LoadEnvFile(p_path string) (*ConfigData, error) {
 
 			default:
 				cfg.PostgresData.ParseLineData(key, value)
+				cfg.RedisData.ParseLineData(key, value)
 			}
 		}
 

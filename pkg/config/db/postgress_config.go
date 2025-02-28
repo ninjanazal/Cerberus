@@ -55,7 +55,6 @@ func (cfg *PostgresConfigData) ParseLineData(p_key string, p_value string) {
 
 	if f, ok := fMap[p_key]; ok {
 		*f = p_value
-		return
 	}
 }
 
