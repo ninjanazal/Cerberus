@@ -1,26 +1,26 @@
-package postgres_config
+package db_config
 
 import (
 	"fmt"
 	"os"
 )
 
-// ConfigData represents the configuration data for a database connection.
+// PostgresConfigData represents the configuration data for a database connection.
 //
 // This struct holds the necessary information to establish a connection
 // to a database server, typically PostgreSQL.
-type ConfigData struct {
+type PostgresConfigData struct {
 	Host    string // The hostname or IP address of the database server
 	Port    string // The port number on which the database server is listening
 	DbName  string // The name of the database to connect to
 	SslMode string // The SSL mode for the connection (e.g., "disable", "require", "verify-full")
 }
 
-// DefaultCfg is a global variable that holds default configuration values.
+// DefaultPostgresCfg is a global variable that holds default configuration values.
 //
 // It is initialized with preset values in the init() function and can be used
 // as a fallback or starting point for database configurations.
-var DefaultCfg ConfigData
+var DefaultPostgresCfg PostgresConfigData
 
 // init initializes the DefaultCfg with preset values.
 //
@@ -28,10 +28,10 @@ var DefaultCfg ConfigData
 // It sets up default values for the database configuration, which can be
 // overridden later if needed.
 func init() {
-	DefaultCfg.Host = "localhost"
-	DefaultCfg.Port = "8080"
-	DefaultCfg.DbName = "db"
-	DefaultCfg.SslMode = "disable"
+	DefaultPostgresCfg.Host = "localhost"
+	DefaultPostgresCfg.Port = "8080"
+	DefaultPostgresCfg.DbName = "db"
+	DefaultPostgresCfg.SslMode = "disable"
 }
 
 // region Public
@@ -45,7 +45,7 @@ func init() {
 // Parameters:
 //   - p_key: A string representing the configuration key.
 //   - p_value: A string representing the value for the given key.
-func (cfg *ConfigData) ParseLineData(p_key string, p_value string) {
+func (cfg *PostgresConfigData) ParseLineData(p_key string, p_value string) {
 	fMap := map[string]*string{
 		"POSTGRES_HOST":    &cfg.Host,
 		"POSTGRES_PORT":    &cfg.Port,
@@ -55,7 +55,6 @@ func (cfg *ConfigData) ParseLineData(p_key string, p_value string) {
 
 	if f, ok := fMap[p_key]; ok {
 		*f = p_value
-		return
 	}
 }
 
@@ -70,7 +69,7 @@ func (cfg *ConfigData) ParseLineData(p_key string, p_value string) {
 // Environment Variables Used:
 //   - POSTGRES_USERNAME: The PostgreSQL username.
 //   - POSTGRES_PASSWORD: The PostgreSQL password.
-func (cfg *ConfigData) GetDsn() string {
+func (cfg *PostgresConfigData) GetDsn() string {
 	var usr string = os.Getenv("POSTGRES_USERNAME")
 	var pwd string = os.Getenv("POSTGRES_PASSWORD")
 

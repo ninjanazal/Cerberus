@@ -2,7 +2,6 @@ package routes
 
 import (
 	"cerberus/internal/database"
-	"cerberus/internal/handlers"
 	auth_handler "cerberus/internal/handlers/auth"
 	md "cerberus/internal/middleware"
 	logger "cerberus/internal/tools"
@@ -29,10 +28,6 @@ func SetupAuthRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dbs *data
 		md.TimeRequestMiddleware, md.CORSMiddleware(p_cfg), md.LogRequestMiddleware)
 
 	return []*Route{
-		NewRoute(p_mux, "/hello",
-			http.HandlerFunc(handlers.HelloWorldHandler),
-			md.TimeRequestMiddleware, md.CORSMiddleware(p_cfg), md.LogRequestMiddleware),
-
 		authGroup.NewRoute("/register", auth_handler.CreateRegisterHandler(p_dbs),
 			md.PostMethodCheckMiddleware),
 
