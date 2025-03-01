@@ -1,8 +1,8 @@
-package db_postgresSQL
+package database
 
 import (
-	postgres_models "cerberus/internal/database/postgresSQL/models"
-	logger "cerberus/internal/tools"
+	"cerberus/internal/models"
+	logger "cerberus/internal/tools/logger"
 	"cerberus/pkg/config"
 	"fmt"
 
@@ -42,7 +42,7 @@ func ConnectPostgres(p_cfg *config.ConfigData) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(&postgres_models.User{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}); err != nil {
 		logger.Log(fmt.Sprintf("AutoMigration failed - %s", err.Error()), logger.ERROR)
 		return nil, err
 	}

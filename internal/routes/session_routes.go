@@ -4,7 +4,7 @@ import (
 	"cerberus/internal/database"
 	session_handler "cerberus/internal/handlers/session"
 	md "cerberus/internal/middleware"
-	logger "cerberus/internal/tools"
+	logger "cerberus/internal/tools/logger"
 	"cerberus/pkg/config"
 	"net/http"
 )

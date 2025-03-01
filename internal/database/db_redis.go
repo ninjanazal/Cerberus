@@ -1,7 +1,7 @@
-package db_redis
+package database
 
 import (
-	logger "cerberus/internal/tools"
+	logger "cerberus/internal/tools/logger"
 	"cerberus/pkg/config"
 	"context"
 	"errors"

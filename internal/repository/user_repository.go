@@ -1,7 +1,7 @@
-package postgres_repository
+package repository
 
 import (
-	postgres_models "cerberus/internal/database/postgresSQL/models"
+	"cerberus/internal/models"
 
 	"gorm.io/gorm"
 )
@@ -17,8 +17,8 @@ import (
 // Returns:
 //   - *postgres_models.User: A pointer to the User struct if found, or nil if not found.
 //   - error: An error if the database query fails, or nil if successful.
-func FindUserByEmail(p_db *gorm.DB, p_email string) (*postgres_models.User, error) {
-	var u postgres_models.User
+func FindUserByEmail(p_db *gorm.DB, p_email string) (*models.User, error) {
+	var u models.User
 	res := p_db.Where("email = ?", p_email).First(&u)
 	if res.Error != nil {
 		return nil, res.Error
@@ -35,12 +35,12 @@ func FindUserByEmail(p_db *gorm.DB, p_email string) (*postgres_models.User, erro
 //
 // Returns:
 //   - error: An error if the creation fails, or nil if successful.
-func CreateUser(p_db *gorm.DB, p_user *postgres_models.User) error {
+func CreateUser(p_db *gorm.DB, p_user *models.User) error {
 	return p_db.Create(p_user).Error
 }
 
-func UpdatePassword(p_db *gorm.DB, p_user *postgres_models.User, p_pwd string) error {
-	return p_db.Model(&postgres_models.User{}).Where("id = ?", p_user.ID).Update("password", p_pwd).Error
+func UpdatePassword(p_db *gorm.DB, p_user *models.User, p_pwd string) error {
+	return p_db.Model(&models.User{}).Where("id = ?", p_user.ID).Update("password", p_pwd).Error
 }
 
 // endregion Public

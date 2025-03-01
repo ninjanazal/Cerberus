@@ -3,7 +3,7 @@ package server
 import (
 	"cerberus/internal/database"
 	"cerberus/internal/routes"
-	logger "cerberus/internal/tools"
+	logger "cerberus/internal/tools/logger"
 	"cerberus/pkg/config"
 	"fmt"
 	"net/http"

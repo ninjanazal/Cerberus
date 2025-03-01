@@ -2,9 +2,9 @@ package session_handler
 
 import (
 	"cerberus/internal/database"
-	postgres_service "cerberus/internal/database/postgresSQL/service"
 	"cerberus/internal/dto/session_dto"
-	logger "cerberus/internal/tools"
+	"cerberus/internal/services"
+	"cerberus/internal/tools/logger"
 	"encoding/json"
 	"net/http"
 )
@@ -20,7 +20,7 @@ func CreateLoginHandler(p_db *database.Databases) http.HandlerFunc {
 			return
 		}
 
-		usr, err := postgres_service.LoginUserPasswordCheck(p_db.Postgres, &req)
+		usr, err := services.LoginUserPasswordCheck(p_db.Postgres, &req)
 		if err != nil {
 			msg := "Invalid credentials - " + err.Error()
 			logger.Log(msg, logger.ERROR)

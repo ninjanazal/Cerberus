@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	logger "cerberus/internal/tools"
+	logger "cerberus/internal/tools/logger"
 	"net/http"
 )
 
