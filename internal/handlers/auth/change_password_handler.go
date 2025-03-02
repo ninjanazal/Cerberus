@@ -18,14 +18,14 @@ import (
 // 3. Responds with a success message or an error
 //
 // Parameters:
-//   - p_db: A pointer to a database.Databases struct, which should contain
+//   - p_db: A pointer to a database.DataRefs struct, which should contain
 //     a Postgres database connection.
 //
 // Returns:
 //   - http.HandlerFunc: A handler function that can be registered with an HTTP server.
 //
 // Note: This handler uses the logger package for error logging.
-func CreateChangePwdHandler(p_db *database.Databases) http.HandlerFunc {
+func CreateChangePwdHandler(p_db *database.DataRefs) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var req auth_dto.ChangePasswordRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

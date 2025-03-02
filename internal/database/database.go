@@ -1,18 +1,23 @@
 package database
 
 import (
-	logger "cerberus/internal/tools/logger"
+	"cerberus/internal/tools/jwt"
+	"cerberus/internal/tools/logger"
 	"cerberus/pkg/config"
 	"fmt"
 
 	"gorm.io/gorm"
 )
 
-// Databases struct holds connections to different database systems.
+// DataRefs struct holds connections to different database systems.
 // Currently, it only contains a connection to a PostgreSQL database.
-type Databases struct {
+type DataRefs struct {
 	Postgres *gorm.DB
-	Redis    *RedisPack
+
+	Redis  *RedisPack
+	JWTGen *jwt.JWTGenerator
+
+	ConfigData *config.ConfigData
 }
 
 // InitDatabases initializes database connections based on the provided configuration.
@@ -32,7 +37,7 @@ type Databases struct {
 //
 // If the connection to PostgreSQL fails, this function will log an error
 // message using the logger package before returning the error.
-func InitDatabases(p_config *config.ConfigData) (*Databases, error) {
+func InitDatabases(p_config *config.ConfigData) (*DataRefs, error) {
 	pdb, err := ConnectPostgres(p_config)
 	if err != nil {
 		logger.Log(fmt.Sprintf("Failed to connect to postgresSQL: %s", err.Error()), logger.ERROR)
@@ -45,8 +50,12 @@ func InitDatabases(p_config *config.ConfigData) (*Databases, error) {
 		return nil, err
 	}
 
-	return &Databases{
+	return &DataRefs{
 		Postgres: pdb,
-		Redis:    rdb,
+
+		Redis:  rdb,
+		JWTGen: jwt.NewJWTGenerator(p_config),
+
+		ConfigData: p_config,
 	}, nil
 }

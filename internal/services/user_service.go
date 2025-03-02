@@ -124,7 +124,7 @@ func ChangePassword(p_db *gorm.DB, p_change_pwd_dto *auth_dto.ChangePasswordRequ
 	return nil
 }
 
-// LoginUserPasswordCheck verifies a user's login credentials against the database.
+// AuthenticateUser verifies a user's login credentials against the database.
 //
 // Parameters:
 //   - p_db: A pointer to the gorm.DB instance for database operations.
@@ -133,9 +133,7 @@ func ChangePassword(p_db *gorm.DB, p_change_pwd_dto *auth_dto.ChangePasswordRequ
 // Returns:
 //   - *postgres_models.User: A pointer to the User model if authentication is successful.
 //   - error: An error if authentication fails, nil otherwise.
-//
-// TODO: Maybe set a group of generic dtos, packs that will be shared between services
-func LoginUserPasswordCheck(p_db *gorm.DB, p_login_dto *session_dto.LoginRequest) (*models.User, error) {
+func AuthenticateUser(p_db *gorm.DB, p_login_dto *session_dto.LoginRequest) (*models.User, error) {
 	usr, err := repository.FindUserByEmail(p_db, p_login_dto.Email)
 	if err != nil {
 		logger.Log("User not found - "+err.Error(), logger.ERROR)
