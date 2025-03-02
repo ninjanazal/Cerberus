@@ -2,7 +2,7 @@ package config
 
 import (
 	"bufio"
-	logger "cerberus/internal/tools"
+	"cerberus/internal/tools/logger"
 	db_config "cerberus/pkg/config/db"
 
 	"errors"

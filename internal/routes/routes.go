@@ -2,7 +2,7 @@ package routes
 
 import (
 	"cerberus/internal/database"
-	logger "cerberus/internal/tools"
+	logger "cerberus/internal/tools/logger"
 	"cerberus/pkg/config"
 	"fmt"
 	"net/http"
@@ -13,15 +13,16 @@ import (
 // Parameters:
 //   - p_mux: A pointer to the http.ServeMux that will handle the routes.
 //   - p_cfg: A pointer to the config.ConfigData containing application configuration.
-//   - p_dbs: A pointer to the database.Databases struct for database connections.
+//   - p_dbs: A pointer to the database.DataRefs struct for database connections.
 //
 // The function doesn't return anything, but it modifies the provided ServeMux
 // by adding routes to it.
-func SetupRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dbs *database.Databases) {
+func SetupRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dbs *database.DataRefs) {
 	logger.Log("Setting up Routes", logger.INFO)
 
 	var routes []*Route = make([]*Route, 0)
 	routes = append(routes, SetupAuthRoutes(p_mux, p_cfg, p_dbs)...)
+	routes = append(routes, SetupSessionRoutes(p_mux, p_cfg, p_dbs)...)
 
 	listRoutes(routes)
 }

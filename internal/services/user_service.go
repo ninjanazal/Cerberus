@@ -1,10 +1,11 @@
-package postgres_service
+package services
 
 import (
-	postgres_models "cerberus/internal/database/postgresSQL/models"
-	postgres_repository "cerberus/internal/database/postgresSQL/repository"
 	"cerberus/internal/dto/auth_dto"
-	logger "cerberus/internal/tools"
+	"cerberus/internal/dto/session_dto"
+	"cerberus/internal/models"
+	"cerberus/internal/repository"
+	logger "cerberus/internal/tools/logger"
 	"errors"
 	"fmt"
 
@@ -22,7 +23,7 @@ import (
 //   - bool: true if the user is registered, false otherwise.
 //   - error: An error if the database query fails, or nil if successful.
 func IsUserRegistered(p_dg *gorm.DB, p_email string) (bool, error) {
-	usr, err := postgres_repository.FindUserByEmail(p_dg, p_email)
+	usr, err := repository.FindUserByEmail(p_dg, p_email)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, nil
 	} else if err != nil {
@@ -46,7 +47,7 @@ func IsUserRegistered(p_dg *gorm.DB, p_email string) (bool, error) {
 //   - An error if registration fails (e.g., duplicate email, password hashing error, or database error).
 //
 // If any step fails, an appropriate error is logged and returned.
-func RegisterUser(p_dg *gorm.DB, p_register_dto *auth_dto.RegisterRequest) (*postgres_models.User, error) {
+func RegisterUser(p_dg *gorm.DB, p_register_dto *auth_dto.RegisterRequest) (*models.User, error) {
 	r, _ := IsUserRegistered(p_dg, p_register_dto.Email)
 	if r {
 		msg := fmt.Sprintf("Failed to registered, duplication - %s", p_register_dto.Email)
@@ -60,13 +61,13 @@ func RegisterUser(p_dg *gorm.DB, p_register_dto *auth_dto.RegisterRequest) (*pos
 		return nil, err
 	}
 
-	var user *postgres_models.User = &postgres_models.User{
+	var user *models.User = &models.User{
 		Name:     p_register_dto.Name,
 		Email:    p_register_dto.Email,
 		Password: string(hashedPwd),
 	}
 
-	err = postgres_repository.CreateUser(p_dg, user)
+	err = repository.CreateUser(p_dg, user)
 	if err != nil {
 		logger.Log("Failed to Create user - "+err.Error(), logger.ERROR)
 		return nil, err
@@ -95,7 +96,7 @@ func RegisterUser(p_dg *gorm.DB, p_register_dto *auth_dto.RegisterRequest) (*pos
 //
 // Note: This function uses bcrypt for password hashing and comparison.
 func ChangePassword(p_db *gorm.DB, p_change_pwd_dto *auth_dto.ChangePasswordRequest) error {
-	usr, err := postgres_repository.FindUserByEmail(p_db, p_change_pwd_dto.Email)
+	usr, err := repository.FindUserByEmail(p_db, p_change_pwd_dto.Email)
 	if err != nil {
 		return errors.New("user not found")
 	}
@@ -114,11 +115,35 @@ func ChangePassword(p_db *gorm.DB, p_change_pwd_dto *auth_dto.ChangePasswordRequ
 		return errors.New("failed to hash the new password - " + err.Error())
 	}
 
-	err = postgres_repository.UpdatePassword(p_db, usr, string(hashedPwd))
+	err = repository.UpdatePassword(p_db, usr, string(hashedPwd))
 	if err != nil {
 		logger.Log("Failed to update password - "+err.Error(), logger.ERROR)
 		return errors.New("failed to update password - " + err.Error())
 	}
 
 	return nil
+}
+
+// AuthenticateUser verifies a user's login credentials against the database.
+//
+// Parameters:
+//   - p_db: A pointer to the gorm.DB instance for database operations.
+//   - p_login_dto: A pointer to the LoginRequest containing the user's email and password.
+//
+// Returns:
+//   - *postgres_models.User: A pointer to the User model if authentication is successful.
+//   - error: An error if authentication fails, nil otherwise.
+func AuthenticateUser(p_db *gorm.DB, p_login_dto *session_dto.LoginRequest) (*models.User, error) {
+	usr, err := repository.FindUserByEmail(p_db, p_login_dto.Email)
+	if err != nil {
+		logger.Log("User not found - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(p_login_dto.Password)); err != nil {
+		logger.Log("Invalid credentials - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	return usr, nil
 }

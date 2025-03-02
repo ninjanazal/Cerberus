@@ -33,6 +33,8 @@ dev:
 	DEBUG=true \
 	CONFIG_FILE=/home/eurico-martins/Repos/Cerberus/example.env \
 	POSTGRES_USERNAME=admin POSTGRES_PASSWORD=password \
+	REDIS_PASSWORD=password \
+	JWT_SECRET=secret \
 	go run cmd/app/main.go
 
 

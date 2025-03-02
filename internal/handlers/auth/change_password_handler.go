@@ -2,9 +2,9 @@ package auth_handler
 
 import (
 	"cerberus/internal/database"
-	postgres_service "cerberus/internal/database/postgresSQL/service"
 	"cerberus/internal/dto/auth_dto"
-	logger "cerberus/internal/tools"
+	"cerberus/internal/services"
+	"cerberus/internal/tools/logger"
 	"encoding/json"
 	"net/http"
 )
@@ -18,14 +18,14 @@ import (
 // 3. Responds with a success message or an error
 //
 // Parameters:
-//   - p_db: A pointer to a database.Databases struct, which should contain
+//   - p_db: A pointer to a database.DataRefs struct, which should contain
 //     a Postgres database connection.
 //
 // Returns:
 //   - http.HandlerFunc: A handler function that can be registered with an HTTP server.
 //
 // Note: This handler uses the logger package for error logging.
-func CreateChangePwdHandler(p_db *database.Databases) http.HandlerFunc {
+func CreateChangePwdHandler(p_db *database.DataRefs) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var req auth_dto.ChangePasswordRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -36,7 +36,7 @@ func CreateChangePwdHandler(p_db *database.Databases) http.HandlerFunc {
 			return
 		}
 
-		err := postgres_service.ChangePassword(p_db.Postgres, &req)
+		err := services.ChangePassword(p_db.Postgres, &req)
 		if err != nil {
 			logger.Log("Failed to change password - "+err.Error(), logger.ERROR)
 			http.Error(w, err.Error(), http.StatusUnauthorized)

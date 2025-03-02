@@ -1,7 +1,7 @@
-package db_redis
+package database
 
 import (
-	logger "cerberus/internal/tools"
+	logger "cerberus/internal/tools/logger"
 	"cerberus/pkg/config"
 	"context"
 	"errors"
@@ -33,7 +33,7 @@ func ConnectRedis(p_cfg *config.ConfigData) (*RedisPack, error) {
 	}
 	pack.Client = redis.NewClient(&redis.Options{
 		Addr:     p_cfg.RedisData.Address,
-		Password: p_cfg.RedisData.Password,
+		Password: p_cfg.RedisData.GetPassword(),
 		DB:       0,
 	})
 
