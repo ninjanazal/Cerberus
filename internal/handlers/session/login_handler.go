@@ -37,7 +37,7 @@ func CreateLoginHandler(p_db *database.DataRefs) http.HandlerFunc {
 			msg := "Invalid request, failed on decode body - " + err.Error()
 			logger.Log(msg, logger.ERROR)
 
-			http.Error(w, err.Error(), http.StatusConflict)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
