@@ -147,3 +147,25 @@ func AuthenticateUser(p_db *gorm.DB, p_login_dto *session_dto.LoginRequest) (*mo
 
 	return usr, nil
 }
+
+// GetUserById retrieves a user from the database by their unique ID.
+// It uses the provided GORM database connection to query the user table
+// and returns the corresponding user model if found. Errors are logged
+// if the user is not found or the query fails.
+//
+// Parameters:
+//   - p_db: A pointer to the GORM database connection (*gorm.DB) used to execute the query.
+//   - p_usrId: The unique ID (string) of the user to be retrieved.
+//
+// Returns:
+//   - *models.User: A pointer to the user model if the user is found; otherwise, nil.
+//   - error: An error object if the query fails or the user is not found; otherwise, nil.
+func GetUserById(p_db *gorm.DB, p_usrId string) (*models.User, error) {
+	usr, err := repository.FindUserById(p_db, p_usrId)
+	if err != nil {
+		logger.Log("User not found - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	return usr, nil
+}
