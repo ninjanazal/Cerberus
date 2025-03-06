@@ -28,7 +28,7 @@ func AuthenticationHeaderMiddleware(p_next http.Handler) http.Handler {
 			return
 		}
 
-		if strings.HasPrefix(authHeader, "Bearer ") {
+		if !strings.HasPrefix(authHeader, "Bearer ") {
 			http.Error(w, "Invalid token format", http.StatusUnauthorized)
 			return
 		}
