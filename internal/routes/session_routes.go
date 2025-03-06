@@ -31,5 +31,8 @@ func SetupSessionRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dgs *d
 	return []*Route{
 		sessionGroup.NewRoute("/login", session_handler.CreateLoginHandler(p_dgs),
 			md.PostMethodCheckMiddleware),
+
+		sessionGroup.NewRoute("/logout", session_handler.CreateLogoutHandler(p_dgs),
+			md.GetMethodCheckMiddleware, md.AuthenticationHeaderMiddleware),
 	}
 }

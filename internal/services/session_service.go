@@ -69,7 +69,30 @@ func LoginUser(p_db *database.DataRefs, p_usr *models.User) (*session_dto.LoginD
 //   - p_usr: A pointer to the User model representing the user whose tokens should be revoked.
 //
 // Note: This function does not return any error. Failures in token revocation are handled silently.
+// TODO: This should also return an error
 func RevokeAllSessionTokensToUser(p_db *database.RedisPack, p_usr *models.User) {
 	repository.RevokeJWTToken(p_db, p_usr.ID.String())
 	repository.RevokeRefreshToken(p_db, p_usr.ID.String())
+}
+
+// IsTokenActive checks if a given JWT token is active for a specific user.
+// It fetches the stored token for the user from Redis and compares it with the provided token.
+// If the tokens match, the token is considered active.
+//
+// Parameters:
+//   - p_db: A pointer to the database references (*database.DataRefs) containing the Redis connection.
+//   - p_usrId: The unique ID (string) of the user whose token is being checked.
+//   - p_tkn: The JWT token (string) to be validated.
+//
+// Returns:
+//   - bool: `true` if the token is active (matches the stored token); otherwise, `false`.
+//   - error: An error object if the token fetch operation fails; otherwise, nil.
+func IsTokenActive(p_db *database.DataRefs, p_usrId string, p_tkn string) (bool, error) {
+	tkn, err := repository.GetJWTToken(p_db.Redis, p_usrId)
+	if err != nil {
+		logger.Log("Failed to fetch the JWT token - "+err.Error(), logger.ERROR)
+		return false, err
+	}
+
+	return p_tkn == tkn, nil
 }

@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -22,7 +21,7 @@ type Claims struct {
 // JWTGenerator is responsible for generating and validating JWT tokens.
 type JWTGenerator struct {
 	Secret   []byte
-	Duration uint
+	Duration time.Duration
 }
 
 // NewJWTGenerator creates a new JWTGenerator instance with the provided configuration.
@@ -35,14 +34,14 @@ type JWTGenerator struct {
 // Returns:
 //   - *JWTGenerator: A pointer to the newly created JWTGenerator instance.
 func NewJWTGenerator(p_cfg *config.ConfigData) *JWTGenerator {
-	d, err := strconv.Atoi(p_cfg.RedisData.JWTDuration)
+	d, err := time.ParseDuration(p_cfg.RedisData.JWTDuration)
 	if err != nil {
 		logger.Log("Failed to parse JWT configuration, fail to default", logger.ERROR)
 		d = 15
 	}
 	return &JWTGenerator{
 		Secret:   []byte(os.Getenv("JWT_SECRET")),
-		Duration: uint(d),
+		Duration: d,
 	}
 }
 
@@ -55,9 +54,9 @@ func NewJWTGenerator(p_cfg *config.ConfigData) *JWTGenerator {
 //   - string: The generated JWT token as a string.
 //   - error: An error if token generation fails, nil otherwise.
 func (gen *JWTGenerator) GenerateJWT(p_usrId string) (string, error) {
-	var expiration time.Time = time.Now().Add(time.Duration(gen.Duration) * time.Minute)
+	var expiration time.Time = time.Now().Add(gen.Duration)
 
-	claims := Claims{
+	claims := &Claims{
 		UserID: p_usrId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -78,7 +77,7 @@ func (gen *JWTGenerator) GenerateJWT(p_usrId string) (string, error) {
 //   - *Claims: A pointer to the Claims structure if the token is valid.
 //   - error: An error if the token is invalid or validation fails, nil otherwise.
 func (gen *JWTGenerator) ValidateJWT(p_token string) (*Claims, error) {
-	claims := Claims{}
+	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(p_token, claims, func(t *jwt.Token) (interface{}, error) {
 		return gen.Secret, nil
@@ -87,7 +86,7 @@ func (gen *JWTGenerator) ValidateJWT(p_token string) (*Claims, error) {
 		return nil, errors.New("invalid token")
 	}
 
-	return &claims, nil
+	return claims, nil
 }
 
 // GenerateRefreshToken generates a new refresh token.
