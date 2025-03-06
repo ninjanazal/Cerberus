@@ -3,6 +3,7 @@ package session_handler
 import (
 	"cerberus/internal/database"
 	"cerberus/internal/dto/session_dto"
+	"cerberus/internal/middleware"
 	"cerberus/internal/services"
 	"cerberus/internal/tools/logger"
 	"encoding/json"
@@ -21,7 +22,7 @@ import (
 //   - http.HandlerFunc: A function that handles the HTTP request and response for logout.
 func CreateLogoutHandler(p_db *database.DataRefs) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tkn := r.Context().Value("token")
+		tkn := r.Context().Value(middleware.JWTToken("token"))
 
 		if tkn == nil || tkn == "" {
 			logger.Log("Invalid token - ", logger.ERROR)
