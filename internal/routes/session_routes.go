@@ -37,5 +37,8 @@ func SetupSessionRoutes(p_mux *http.ServeMux, p_cfg *config.ConfigData, p_dgs *d
 
 		sessionGroup.NewRoute("/validate", session_handler.CreateValidateHandler(p_dgs),
 			md.PostMethodCheckMiddleware, md.AuthenticationHeaderMiddleware),
+
+		sessionGroup.NewRoute("/refresh", session_handler.CreateRefreshHandler(p_dgs),
+			md.PostMethodCheckMiddleware, md.AuthenticationHeaderMiddleware),
 	}
 }

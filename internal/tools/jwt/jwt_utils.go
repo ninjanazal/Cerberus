@@ -116,3 +116,20 @@ func (gen *JWTGenerator) GenerateRefreshToken() (string, error) {
 func (gen *JWTGenerator) ValidateRefreshToken(p_savedToken string, p_targetToken string) bool {
 	return p_savedToken == p_targetToken
 }
+
+// GetUserIDFromToken extracts the user ID from the provided JWT token.
+// It parses the token using the JWT secret stored in the JWTGenerator instance
+// and validates the token's signature. If the token is valid, it returns the user ID
+// embedded in the token. If the token is invalid or parsing fails, it returns an error.
+func (gen *JWTGenerator) GetUserIDFromToken(p_token string) (string, error) {
+	claims := &Claims{}
+
+	_, err := jwt.ParseWithClaims(p_token, claims, func(t *jwt.Token) (interface{}, error) {
+		return gen.Secret, nil
+	})
+	if err != nil {
+		return "", errors.New("invalid token")
+	}
+
+	return claims.UserID, nil
+}

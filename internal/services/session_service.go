@@ -66,13 +66,13 @@ func LoginUser(p_db *database.DataRefs, p_usr *models.User) (*session_dto.LoginD
 //
 // Parameters:
 //   - p_db: A pointer to the RedisPack structure for database operations.
-//   - p_usr: A pointer to the User model representing the user whose tokens should be revoked.
+//   - p_usr_id: The unique ID (string) of the user whose token is being checked
 //
 // Note: This function does not return any error. Failures in token revocation are handled silently.
 // TODO: This should also return an error
-func RevokeAllSessionTokensToUser(p_db *database.RedisPack, p_usr *models.User) {
-	repository.RevokeJWTToken(p_db, p_usr.ID.String())
-	repository.RevokeRefreshToken(p_db, p_usr.ID.String())
+func RevokeAllSessionTokensToUser(p_db *database.RedisPack, p_usr_id string) {
+	repository.RevokeJWTToken(p_db, p_usr_id)
+	repository.RevokeRefreshToken(p_db, p_usr_id)
 }
 
 // IsTokenActive checks if a given JWT token is active for a specific user.
@@ -95,4 +95,53 @@ func IsTokenActive(p_db *database.DataRefs, p_usrId string, p_tkn string) (bool,
 	}
 
 	return p_tkn == tkn, nil
+}
+
+// ValidateRefreshToken validates the provided refresh token against the stored token for the given user.
+// It fetches the stored refresh token from Redis and compares it with the provided token.
+// Returns true if the tokens match, otherwise false. Also returns an error if any operation fails.
+func ValidateRefreshToken(p_db *database.DataRefs, p_userId string, p_token string) (bool, error) {
+	tkn, err := repository.GetRefreshToken(p_db.Redis, p_userId)
+	if err != nil {
+		logger.Log("Failed to fetch the Refresh token - "+err.Error(), logger.ERROR)
+		return false, err
+	}
+
+	return p_token == tkn, nil
+}
+
+// GenerateTokensAndSave generates a new JWT access token and a refresh token for the given user.
+// It stores both tokens in Redis and returns the generated tokens in a RefreshData struct.
+// If any step fails, it logs the error and returns nil and the error.
+func GenerateTokensAndSave(p_db *database.DataRefs, p_userId string) (*session_dto.RefreshData, error) {
+	tkn, err := p_db.JWTGen.GenerateJWT(p_userId)
+	if err != nil {
+		logger.Log("Failed to generate the JWT token - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	rTkn, err := p_db.JWTGen.GenerateRefreshToken()
+	if err != nil {
+		logger.Log("Failed to generate the JWT Refresh token - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	err = repository.StoreJWTToken(p_db.Redis, p_userId, tkn, p_db.ConfigData.RedisData.GetJWTDuration())
+	if err != nil {
+		logger.Log("Failed to store JWTToken - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	err = repository.StoreRefreshToken(p_db.Redis, p_userId, rTkn,
+		p_db.ConfigData.RedisData.GetRefreshJWTDuration())
+	if err != nil {
+		repository.RevokeJWTToken(p_db.Redis, p_userId)
+		logger.Log("Failed to store RefreshToken - "+err.Error(), logger.ERROR)
+		return nil, err
+	}
+
+	return &session_dto.RefreshData{
+		AccessToken:  tkn,
+		RefreshToken: rTkn,
+	}, nil
 }
