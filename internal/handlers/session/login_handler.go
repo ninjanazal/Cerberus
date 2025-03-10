@@ -50,7 +50,7 @@ func CreateLoginHandler(p_db *database.DataRefs) http.HandlerFunc {
 			return
 		}
 
-		services.RevokeAllSessionTokensToUser(p_db.Redis, usr)
+		services.RevokeAllSessionTokensToUser(p_db.Redis, usr.ID.String())
 
 		loginData, err := services.LoginUser(p_db, usr)
 		if err != nil {

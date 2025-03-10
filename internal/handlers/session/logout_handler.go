@@ -58,7 +58,7 @@ func CreateLogoutHandler(p_db *database.DataRefs) http.HandlerFunc {
 			return
 		}
 
-		services.RevokeAllSessionTokensToUser(p_db.Redis, usr)
+		services.RevokeAllSessionTokensToUser(p_db.Redis, usr.ID.String())
 		res := session_dto.LogoutResponse{
 			Message: "Logged out successfully",
 		}
